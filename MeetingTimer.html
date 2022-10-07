@@ -1,0 +1,141 @@
+<html>
+	<head>
+		<title>Meeting Timer - Time who's talking</title>
+		<script type="text/javascript">
+			/**
+			 * A class that helps you keep track of who's talking during a meeting.
+			 *
+			 * 
+			 * @param {attendees : array}
+			 */
+			function Meeting(attendees) {
+			    const LOG_TEMPLATE = {speaker : "", start : null, stop : null};
+
+			    this._attendees = attendees || [];
+			    this._talkLog = [];
+			    this._currentTalk = {speaker : "", start : null, stop : null};
+			    this._meetingEnd;
+
+
+			    /**
+			     * Provided with the name of who is talking, this function logs the 
+			     * time of when someone started talking during a meeting
+			     * 
+			     * @param  {n : String}
+			     */
+			    this.isTalking = function(n) {
+			        var _time = this._stopTalking();
+
+			        this._currentTalk.speaker = n;
+			        this._currentTalk.start = _time;
+			        
+			        console.log(`${n} is now talking`);
+			    }
+
+			    /**
+			     * This internal function is used to log someone who stopped talking.
+			     * 
+			     * @return {_t : Date}
+			     */
+			    this._stopTalking = function() {
+			        var _t = Date.now();
+			        if (this._currentTalk.speaker) {
+			            this._currentTalk.stop = _t;
+			            this._talkLog.push(Object.assign({},this._currentTalk));
+			            console.log(`${this._currentTalk.speaker} stopped talking`)
+			        }
+			        this._currentTalk = Object.assign({},LOG_TEMPLATE);
+			        return _t;
+			    }
+
+			    /**
+			     * When there is silence during the meeting, this function stops all talking.
+			     * 
+			     */
+			    this.silence = function() {
+			        this._stopTalking();
+			    }
+
+			    
+			    /**
+			     * Records when the meeting has ended
+			     */
+			    this.endMeeting = function() {
+			        this._meetingEnd = this._stopTalking();
+			        console.log(`Meeting stopped at ${this._meetingEnd}`);
+			    }
+
+			    this.getAttendees = function() {
+			        return this._attendees;
+			    }
+
+			    this.getTalkLogTable = function() {
+			        return console.table(this._talkLog);
+			    }
+
+			    this.getTalkLog = function() {
+			        return this._talkLog;
+			    }
+			}
+		</script>
+		<script type="text/javascript">
+			var _meeting;
+
+			function _createMeeting() {
+				var _txtAttendees = document.getElementById("txt_attendees").value;
+				_attendees = _txtAttendees.split(",");
+				_meeting = new Meeting(_attendees);
+
+				var _container = document.getElementById("speakers");
+
+				for (var i = 0; i < _attendees.length; i++) {
+					var _btn = document.createElement("button");
+					_btn.innerHTML = _attendees[i];
+					_btn.addEventListener("click",((_a) => {
+						_meeting.isTalking(_a);
+					}).bind(null, [_attendees[i]]));
+
+					_container.appendChild(_btn);
+				}
+
+				var _silenceBtn = document.createElement("button");
+				_silenceBtn.innerHTML = "Silence";
+				_silenceBtn.addEventListener("click",(() => {
+					_meeting.silence();
+				}).bind(null, []));
+
+				var _endMeetingBtn = document.createElement("button");
+				_endMeetingBtn.innerHTML = "End Meeting";
+				_endMeetingBtn.addEventListener("click",(() => {
+					_meeting.endMeeting();
+				}).bind(null, []));
+
+				var _printLogBtn = document.createElement("button");
+				_printLogBtn.innerHTML = "Print Log";
+				_printLogBtn.addEventListener("click",(() => {
+					document.getElementById("csv").removeAttribute("hidden");
+					_meeting.getTalkLogTable();
+					var _log = "Speaker,Time (mins)\n"+_meeting.getTalkLog().map((_l) => `${_l.speaker},${(_l.stop-_l.start)/60000}`).join("\n");
+
+					document.getElementById("txtTalkLog").value = _log;
+				}).bind(null, []));
+
+				_container.appendChild(_silenceBtn);
+				_container.appendChild(_endMeetingBtn);
+				_container.appendChild(_printLogBtn);
+
+				document.getElementById("creatorDiv").setAttribute("hidden","hidden");
+			}
+		</script>
+	</head>
+	<body>
+		<div id="creatorDiv">
+			<input type="text" id="txt_attendees" name="attendees" placeholder="Comma separated attendees"/>
+			<button onclick="_createMeeting()">Create!</button>
+		</div>
+		<div id="speakers"></div>
+		<div id="csv" hidden>
+			<textarea id="txtTalkLog"></textarea>
+		</div>
+	</body>
+</html>
