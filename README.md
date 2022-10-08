@@ -14,7 +14,7 @@ So I spent an hour hacking some Javascript, wrapped it up in some ugly HTML, but
 5. Press the Print Log button to view the log in a CSV format, which you can copy to a spreadsheet solution for further manipulation. (*hint*: if you're a geek, open up the Browser JS Console...)
 
 ## Do you want to try it online?
-Sure - here's a [link](https://rawcdn.githack.com/maqqju/time-whos-talking/030c1d7d12f95c24a3e7b40bb2ea2b9566711fa3/MeetingTimer.html).
+Sure - here's a [link](https://raw.githack.com/maqqju/time-whos-talking/main/MeetingTimer.html).
 
 ## Feel like contributing?
 Be my guest.
