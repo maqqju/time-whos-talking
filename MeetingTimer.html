@@ -81,33 +81,41 @@
 		<script type="text/javascript">
 			var _meeting;
 
+			function updateCommentary(_commentary) {
+				document.getElementById("commentary").innerHTML = _commentary;
+			}
+
 			function _createMeeting() {
 				var _txtAttendees = document.getElementById("txt_attendees").value;
 				_attendees = _txtAttendees.split(",");
 				_meeting = new Meeting(_attendees);
 
-				var _container = document.getElementById("speakers");
+				var _speakersContainer = document.getElementById("speakers");
 
 				for (var i = 0; i < _attendees.length; i++) {
 					var _btn = document.createElement("button");
 					_btn.innerHTML = _attendees[i];
 					_btn.addEventListener("click",((_a) => {
 						_meeting.isTalking(_a);
+						 updateCommentary(`${_a} is talking...`);
 					}).bind(null, [_attendees[i]]));
 
-					_container.appendChild(_btn);
+					_speakersContainer.appendChild(_btn);
 				}
 
 				var _silenceBtn = document.createElement("button");
 				_silenceBtn.innerHTML = "Silence";
 				_silenceBtn.addEventListener("click",(() => {
 					_meeting.silence();
+					updateCommentary("**silence**");
 				}).bind(null, []));
 
 				var _endMeetingBtn = document.createElement("button");
 				_endMeetingBtn.innerHTML = "End Meeting";
 				_endMeetingBtn.addEventListener("click",(() => {
 					_meeting.endMeeting();
+					document.getElementById("speakers").setAttribute("hidden","hidden");
+					updateCommentary("Meeting ended.");
 				}).bind(null, []));
 
 				var _printLogBtn = document.createElement("button");
@@ -120,9 +128,11 @@
 					document.getElementById("txtTalkLog").value = _log;
 				}).bind(null, []));
 
-				_container.appendChild(_silenceBtn);
-				_container.appendChild(_endMeetingBtn);
-				_container.appendChild(_printLogBtn);
+				var _controlsContainer = document.getElementById("controls");
+
+				_controlsContainer.appendChild(_silenceBtn);
+				_controlsContainer.appendChild(_endMeetingBtn);
+				_controlsContainer.appendChild(_printLogBtn);
 
 				document.getElementById("creatorDiv").setAttribute("hidden","hidden");
 			}
@@ -134,6 +144,8 @@
 			<button onclick="_createMeeting()">Create!</button>
 		</div>
 		<div id="speakers"></div>
+		<div id="controls"></div>
+		<div id="commentary"></div>
 		<div id="csv" hidden>
 			<textarea id="txtTalkLog"></textarea>
 		</div>
